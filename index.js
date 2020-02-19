@@ -12,8 +12,8 @@ consign()
     .into(app)
 
 
-app.get('/users/:id', (req,res) => {
-    res.send(`Hello my ${req.params.id}º user`)
+app.get('/users/estyvison', (req,res) => {
+    res.json({ nome: 'estyvison'})
 })
 
 app.listen(3000, () => {
