@@ -1,20 +1,20 @@
 const express = require('express')
 const app = express()
 const consign = require('consign')
-const db = require('./config/db')
+const db = require('./repository/db.js')
 app.db = db
 
 
 consign()
+    .include('./config/passport.js')
+    .then('./config/auth.js')
     .then('./config/middlewares.js')
+    .then('./models/validation.js')
     .then( './models')
-    .then('./config/routes.js')
+    .then( './controllers')
+    .then('./routes/userRoutes.js')
     .into(app)
 
-
-app.get('/users/estyvison', (req,res) => {
-    res.json({ nome: 'estyvison'})
-})
 
 app.listen(3000, () => {
     console.log("backend executando...!!!")
