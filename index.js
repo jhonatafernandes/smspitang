@@ -12,7 +12,7 @@ consign()
     .then('./models/validation.js')
     .then( './models')
     .then( './controllers')
-    .then('./routes/userRoutes.js')
+    .then('./routes')
     .into(app)
 
 
