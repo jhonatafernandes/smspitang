@@ -21,8 +21,8 @@ module.exports = app => {
     const getById = (story, req, res) => {
         
         app.db('storys')
-            .select('id', 'message', 'storyId', 'dateTimeStory', 'type')
-            .where({storyId: story.id})
+            .select('id', 'message', 'userId', 'dateTimeStory', 'type')
+            .where({userId: story.userId}).first()
             .then(storyb => res.json(storyb))
             .catch(err => res.status(500).send(err))
         

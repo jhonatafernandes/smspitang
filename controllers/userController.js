@@ -10,11 +10,10 @@ module.exports = app => {
         if(req.params.id) user.id = req.params.id
 
         try{
-            existsOrError(user.name, 'Nome não informado')
+            existsOrError(user.username, 'Nome não informado')
             existsOrError(user.email, 'Email não informado')
             existsOrError(user.password, 'Senha não informada')
             existsOrError(user.confirmPassword, 'Confirmação de senha inválida')
-            existsOrError(user.cellphone, 'Telefone não informado')
             equalsOrError(user.password, user.confirmPassword, 'Senhas não conferem')
 
 

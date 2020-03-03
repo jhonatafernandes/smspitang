@@ -29,7 +29,7 @@ module.exports = app => {
 
     const get = (req, res) => {
         app.db('users')
-            .select('id', 'name', 'email', 'admin')
+            .select('id', 'username', 'email', 'admin')
             .then(users => res.json(users))
             .catch(err => res.status(500).send(err))
 
@@ -38,7 +38,7 @@ module.exports = app => {
     const getById = (user, req, res) => {
         
         app.db('users')
-            .select('id', 'name', 'email', 'admin')
+            .select('id', 'username', 'email', 'admin')
             .where({id: user.id})
             .first()
             .then(userb => res.json(userb))

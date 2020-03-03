@@ -8,21 +8,24 @@ module.exports = app => {
     const saveController = async (req, res) => {
         const contact = { ...req.body }
         if(req.params.id) contact.id = req.params.id
-
-        try{
-            existsOrError(contact.idOwner, 'Seu id é inválido')
-            existsOrError(contact.idTarget, 'Id do contato inválido')
-
-
-            const contactFromDB = await app.db('contacts')
-                .where({idOwner: contact.idOwner, idTarget: contact.idTarget }).first()
-
-            if(!contact.id){
-                notExistsOrError(contactFromDB, 'Contato já cadastrado')
+        if(!contact.id){
+            try{
+                existsOrError(contact.idOwner, 'Seu id é inválido')
+                existsOrError(contact.idTarget, 'Id do contato inválido')
+    
+    
+                const contactFromDB = await app.db('contacts')
+                    .where({idOwner: contact.idOwner, idTarget: contact.idTarget }).first()
+    
+                if(!contact.id){
+                    notExistsOrError(contactFromDB, 'Contato já cadastrado')
+                }
+            }catch(msg){
+                return res.status(400).send(msg)
             }
-        }catch(msg){
-            return res.status(400).send(msg)
+
         }
+        
         return app.models.contacts.save(contact, req, res)
        
     }

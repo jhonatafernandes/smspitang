@@ -1,0 +1,60 @@
+USERS
+
+    'id' > identificador fornecido pelo banco INT
+    'username' > login do usuário STRING
+    'email' > email do usuário STRING UNIQUE
+    'password' > senha do usuário STRING
+    'imageUrl' > url da imagem do perfil do usuário STRING
+    'admin' > booleano para admin BOOLEAN
+
+    {
+        "username": "teste",
+        "email": "teste@teste.com",     
+        "password" "1234",
+        "confirmPassword": "1234"
+    }
+
+    GET > não precisa enviar nada no Body
+    POST > enviar o json acima
+    PUT > enviar o id na url e as alterações no Body
+    DELETE > enviar o id na url
+
+
+
+CONTACTS
+
+    'id' > identificador fornecido pelo banco INT
+    'name' > nome personalizado do contato STRING
+    'idOwner' > id que referencia a table USERS. Este id é do dono do contato SMALLINT(1)
+    'idTarget' > id que referencia a table USERS. Este id é do contato cadastrado SMALLINT(1)
+
+    {
+        "name": "teste",
+        "idOwner": "2",     
+        "idTarget" "1"
+    }
+
+    GET > não precisa enviar nada no Body
+    POST > enviar o json acima
+    PUT > enviar o id na url e as alterações no Body
+    DELETE > enviar o id na url
+
+
+STORYS
+
+    'id' > identificador fornecido pelo banco INT
+    'message' > mensagem do story STRING
+    'userId' > id que referencia a table USERS. Este id é do dono do story SMALLINT(1)
+    'dateTimeStory' > datetime de quando o story foi publicado DATETIME
+    'type' > tipo do hexadecimal que será visto no frontend STRING
+
+    {
+        "message": "teste",
+        "userId": "2",     
+        "type" "1"
+    }
+
+    GET > não precisa enviar nada no Body
+    POST > enviar o json acima
+    PUT > enviar o id na url e as alterações no Body
+    DELETE > enviar o id na url
