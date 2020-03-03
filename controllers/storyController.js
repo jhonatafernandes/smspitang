@@ -1,0 +1,63 @@
+const bcrypt = require('bcrypt-nodejs')
+
+module.exports = app => {
+    const { existsOrError, notExistsOrError, equalsOrError} = app.models.validation
+    const { save, get, getById, deleteById} = app.models.storys
+
+
+    const saveController = async (req, res) => {
+        const story = { ...req.body }
+        if(req.params.id) story.id = req.params.id
+
+        try{
+            existsOrError(story.message, 'Mensagem não informada')
+            existsOrError(story.type, 'Tipo não informado')
+
+        }catch(msg){
+            return res.status(400).send(msg)
+        }
+        return app.models.storys.save(story, req, res)
+       
+    }
+
+    const deleteByIdController = async (req, res) => {
+        const story = { ...req.body }
+        if(req.params.id) story.id = req.params.id
+
+        const storyFromDB = await app.db('storys')
+            .where({id: story.id}).first()
+
+        try {
+            existsOrError(storyFromDB, 'Story inexistente')
+        }catch(msg){
+            return res.status(400).send(msg)
+        }
+        return app.models.storys.deleteById(story, req, res)
+        
+    }
+
+    const getController = async (req, res) => {
+        //IMPLEMENTAR MAIS VALIDAÇÕES
+        return app.models.storys.get(req, res)
+    }
+    
+    const getByIdContactController = async (req, res) => {
+        //IMPLEMENTAR MAIS VALIDAÇÕES
+        const story = { ...req.body }
+        if(req.params.id) story.id = req.params.id
+        const storyFromDB = await app.db('storys')
+            .where({id: story.id}).first()
+
+        try {
+            existsOrError(storyFromDB, 'Contato inexistente')
+        }catch(msg){
+            return res.status(400).send(msg)
+        }
+        return app.models.storys.getById(story, req, res)
+    }
+
+
+
+
+    return{ saveController, getController, getByIdContactController, deleteByIdController }
+}

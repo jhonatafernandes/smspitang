@@ -4,7 +4,7 @@ exports.up = function(knex, promise) {
         table.increments('id').primary()
         table.string('message').notNull()
         table.integer('userId').unsigned().references('id').inTable('users').notNull()
-        table.dateTime('dateTimeStory').notNull()
+        table.dateTime('dateTimeStory').defaultTo(knex.fn.now())
         table.string('type', 1).notNull()
     } )
   
