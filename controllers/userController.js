@@ -1,42 +1,73 @@
-const bcrypt = require('bcrypt-nodejs')
+const bcrypt = require('bcrypt')
 
 module.exports = app => {
-    const { existsOrError, notExistsOrError, equalsOrError} = app.models.validation
+    const { existsOrError, notExistsOrError, equalsOrError, notExistsOnDb} = app.models.validation
     const { save, get, getById} = app.models.users
 
+    // const encryptPassword = password => {
+    //     const salt = bcrypt.genSaltSync(10)
+    //     return bcrypt.hashSync(password, salt)
+    // }
+
+    
 
     const saveController = async (req, res) => {
         const user = { ...req.body }
         if(req.params.id) user.id = req.params.id
-
-        try{
-            existsOrError(user.username, 'Nome não informado')
-            existsOrError(user.email, 'Email não informado')
-            existsOrError(user.password, 'Senha não informada')
-            existsOrError(user.confirmPassword, 'Confirmação de senha inválida')
-            equalsOrError(user.password, user.confirmPassword, 'Senhas não conferem')
-
-
-            const userFromDB = await app.db('users')
-            .where({email: user.email}).first()
-            if(!user.id){
-                notExistsOrError(userFromDB, 'Usuário já cadastrado')
+        if(!user.id){
+            try{
+                existsOrError(user.username, 'Nome não informado')
+                existsOrError(user.email, 'Email não informado')
+                existsOrError(user.password, 'Senha não informada')
+                existsOrError(user.confirmPassword, 'Confirmação de senha inválida')
+                equalsOrError(user.password, user.confirmPassword, 'Senhas não conferem')
+    
+    
+                const userFromDB = await app.db('users')
+                .where({email: user.email}).first()
+                if(!user.id){
+                    notExistsOrError(userFromDB, 'Usuário já cadastrado')
+                }
+            }catch(msg){
+                return res.status(400).send(msg)
             }
-        }catch(msg){
-            return res.status(400).send(msg)
+
+        }else{
+            try{
+                existsOrError(user.password, 'Senha não informada')
+                existsOrError(user.confirmPassword, 'Confirmação de senha inválida')
+                equalsOrError(user.password, user.confirmPassword, 'Senhas não conferem')
+    
+    
+                const passFromDB = await app.db('histpassword')
+                .select('userId', 'password', 'dateTimeAlteration')
+                .where({userId: user.id})
+                console.log("antes do ondb")
+                notExistsOnDb(passFromDB, user.password, 'Senha utilizada anteriormente')
+                
+            }catch(msg){
+                console.log("catch controller")
+                return res.status(800).send(msg)
+            }
+        
+
         }
-        return app.models.users.save(user, req, res)
+        console.log("nntes do salt")
+        const saltRounds = 10
+        bcrypt.hash(user.password, saltRounds, function(err, hash){
+            console.log("dentro do bcrypt")
+            delete user.confirmPassword
+            user.password = hash
+            return app.models.users.save(user, req, res)
+        });
+        
+      
        
     }
 
 
 
-    const savePutController = async (req, res) => {
-        const user = { ...req.body }
-        if(req.params.id) user.id = req.params.id
-
-        return app.models.users.save(user, req, res)
-    }
+   
 
     const deleteController = async (req, res) => {
         const user = { ...req.body }
@@ -77,5 +108,5 @@ module.exports = app => {
 
 
 
-    return{ saveController, getController, getByIdController,savePutController, deleteController }
+    return{ saveController, getController, getByIdController, deleteController }
 }

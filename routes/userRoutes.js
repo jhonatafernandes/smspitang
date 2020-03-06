@@ -15,7 +15,7 @@ module.exports = app => {
 
     app.route('/users/:id')
         //.all(app.config.passport.authenticate())
-        .put(app.controllers.userController.savePutController)
+        .put(app.controllers.userController.saveController)
         .get(app.controllers.userController.getByIdController)
         // .delete(admin(app.controllers.userController.deleteController))
         .delete(app.controllers.userController.deleteController)

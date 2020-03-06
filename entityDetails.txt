@@ -10,7 +10,7 @@ USERS
     {
         "username": "teste",
         "email": "teste@teste.com",     
-        "password" "1234",
+        "password": "1234",
         "confirmPassword": "1234"
     }
 
