@@ -5,6 +5,7 @@ exports.up = function(knex, promise) {
         table.string('name')
         table.integer('idOwner').references('id').inTable('users').notNull()
         table.integer('idTarget').references('id').inTable('users').notNull()
+        table.dateTime('deletedAt')
 
 
     })

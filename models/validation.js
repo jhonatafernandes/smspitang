@@ -23,44 +23,49 @@ module.exports = app => {
 
 
      function  notExistsOnDb(passBd,password, msg){         
-        new Promise((resolve, reject) => {
+        return new Promise((resolve, reject) => {
             passBd.forEach((userPass)=>{
                 bcrypt.compare(password, userPass.password).then(function(result) {
                     if(result){
-                        console.log("entrou no reject")
-                        reject(new Error("ERRO"))                   
+                        console.log("entrou no result on db")
+                        return reject("msg")                 
+                    }else{
+                        return resolve('ok')
                     }
+
                 });
             })
 
-            resolve("Deu certo");
+            
         });
+
+
+
     }
 
-    // function notExistsOnDb(passBd,password, msg){
-    //     console.log("anres da promise")
-    //     new Promise((resolve, reject) => {
-    //         console.log("dentro da promise")
-    //         passBd.forEach((userPass)=>{
-    //             bcrypt.compare(password, userPass.password).then(function(result) {
-    //                 try{
-    //                     console.log("no try")
-    //                     falseOrError(result, "senha utilizada")
-    //                 }catch(msg){
-    //                     console.log("no catch")
-    //                     reject(new Error("Falha na geração"))
 
-    //                 }
-    //             });
-    //         })
-        
-    //     })
-    // }
+
+    function validatePassword(pass, hash, msg){
+        return new Promise((resolve, reject) => {
+            bcrypt.compare(pass, hash).then(function(result) {
+                if(result){
+                    console.log("entrou no result")
+                    return resolve("ok")
+                }else{
+                    console.log("entrou rejesct")
+                    return reject("no")
+                    
+                }
+            })
+
+        })
+    }
+
 
     function falseOrError(value, msg){
         if(value) throw msg
     }
     
     
-    return { existsOrError, notExistsOrError, equalsOrError, notExistsOnDb, falseOrError}
+    return { existsOrError, notExistsOrError, equalsOrError, notExistsOnDb, falseOrError, validatePassword}
 }

@@ -8,44 +8,41 @@ module.exports = app => {
     // }
 
     const save = async (user, req, res) => {
-        // user.password = encryptPassword(user.password)
-        // delete user.confirmPassword
 
         if(user.id){
             try{
                 app.db('users')
                 .update(user)
                 .where({id: user.id})
-                app.db('histpassword')
-                .insert({userId: user.id, password: user.password})
-                .then(_ => res.status(204).send())
+                .then(async _ => {
+                    app.db('histpassword')
+                    .insert({userId: user.id, password: user.password})
+                    .then(_ => res.status(204).send())
+                    .catch(err => res.status(500).send(err))
+                    
+
+                })
+                .catch(err => res.status(500).send(err))
                 
             }catch(err){
                 err => res.status(500).send(err)
 
             }
             
-            //     const histPass = {
-            //     userId: user.id,
-            //     password: user.password
-            // }
-            // app.db('histpassword')
-            //     .insert(histPass)
-            
         }else{
-
-            // const histPass = {
-            //     userId: user.id,
-            //     password: user.password
-            // }
-            // app.db('histpassword')
-            //     .insert(histPass)
-            // }
-            app.db('users')
+           
+                app.db('users')
                 .insert(user)
-                .db('histpassword')
-                .insert({userId: user.id, password: user.password})
-                .then(_ => res.status(204).send())
+                .then(async _ => {
+                    const userFromDB = await app.db('users')
+                    .where({email: user.email}).first()
+                    app.db('histpassword')
+                    .insert({userId: userFromDB.id, password: user.password})
+                    .then(_ => res.status(204).send())
+                    .catch(err => res.status(500).send(err))
+                    
+
+                })
                 .catch(err => res.status(500).send(err))
 
         }
@@ -55,7 +52,7 @@ module.exports = app => {
 
     const get = (req, res) => {
         app.db('users')
-            .select('id', 'username','password', 'email', 'admin')
+            .select('id', 'username', 'email', 'admin', 'imageUrl', 'deletedAt')
             .then(users => res.json(users))
             .catch(err => res.status(500).send(err))
 
@@ -64,7 +61,7 @@ module.exports = app => {
     const getById = (user, req, res) => {
         
         app.db('users')
-            .select('id', 'username', 'email', 'admin')
+            .select('id', 'username', 'email', 'admin', 'imageUrl', 'deletedAt')
             .where({id: user.id})
             .first()
             .then(userb => res.json(userb))
@@ -74,8 +71,8 @@ module.exports = app => {
 
     const deleteById = (user, req, res) => {
         app.db('users')
-            .where({id: user.id}).first()
-            .del()
+            .update({deletedAt: new Date()})
+            .where({id: user.id})
             .then(_ => res.status(204).send())
             .catch(err => res.status(500).send(err))
 

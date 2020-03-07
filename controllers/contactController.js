@@ -12,7 +12,14 @@ module.exports = app => {
             try{
                 existsOrError(contact.idOwner, 'Seu id é inválido')
                 existsOrError(contact.idTarget, 'Id do contato inválido')
-    
+                
+                const ownerFromUsers = await app.db('users')
+                    .where({id: contact.idOwner}).first()
+                existsOrError(ownerFromUsers, 'Seu usuário não existe!')
+
+                const targetFromUsers = await app.db('users')
+                    .where({id: contact.idTarget}).first()
+                existsOrError(targetFromUsers, 'Usuário do contato não existe!')
     
                 const contactFromDB = await app.db('contacts')
                     .where({idOwner: contact.idOwner, idTarget: contact.idTarget }).first()

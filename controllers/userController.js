@@ -1,7 +1,7 @@
 const bcrypt = require('bcrypt')
 
 module.exports = app => {
-    const { existsOrError, notExistsOrError, equalsOrError, notExistsOnDb, falseOrError} = app.models.validation
+    const { existsOrError, notExistsOrError, equalsOrError, notExistsOnDb, falseOrError, validatePassword} = app.models.validation
     const { save, get, getById} = app.models.users
 
     // const encryptPassword = password => {
@@ -23,11 +23,16 @@ module.exports = app => {
                 equalsOrError(user.password, user.confirmPassword, 'Senhas não conferem')
     
     
-                const userFromDB = await app.db('users')
-                .where({email: user.email}).first()
-                if(!user.id){
-                    notExistsOrError(userFromDB, 'Usuário já cadastrado')
-                }
+                const emailFromDB = await app.db('users')
+                .where({email: user.email})
+                notExistsOrError(emailFromDB, 'Email já cadastrado')
+
+                const usernameFromDB = await app.db('users')
+                .where({username: user.username}).first()
+                notExistsOrError(usernameFromDB, 'Username já cadastrado')
+
+
+                
             }catch(msg){
                 return res.status(400).send(msg)
             }
@@ -50,36 +55,67 @@ module.exports = app => {
 
 
         try{
-            existsOrError(user.password, 'Senha não informada')
-            existsOrError(user.confirmPassword, 'Confirmação de senha inválida')
-            equalsOrError(user.password, user.confirmPassword, 'Senhas não conferem')
+
+            if(user.actualPassword){
+                const userFromDB = await app.db('users')
+                .where({id: user.id}).first()
+                existsOrError(userFromDB, 'Usuário não existe')
+                await validatePassword(user.actualPassword, userFromDB.password, "mensagem qualquer")
+                .then(function(ok) {})
+
+                .catch(no => {
+                    console.log("to no catch")
+                    throw "senha atual incorreta!"
+                })
+                existsOrError(user.password, 'Senha não informada')
+                existsOrError(user.confirmPassword, 'Confirmação de senha inválida')
+                equalsOrError(user.password, user.confirmPassword, 'Senhas não conferem')
+
+
+                const passFromDB = await app.db('histpassword')
+                .select('userId', 'password', 'dateTimeAlteration')
+                .where({userId: user.id})
+
+
+                console.log("antes ondb")
+                await notExistsOnDb(passFromDB, user.password, "senha xsc")
+                .then(function(ok) {
+                })
+
+                .catch(no => {
+                    console.log("to no catch ondb")
+                    throw "senha já utilzada!"
+                })
+                
+                
+            }
+            if(user.email){
+                const userFromDB = await app.db('users')
+                .where({email: user.email}).first()
+                notExistsOrError(userFromDB, 'Email já existe')
+            }
+            if(user.username){
+                const userFromDB = await app.db('users')
+                .where({username: user.username}).first()
+                notExistsOrError(userFromDB, 'Username já existe')
+            }
 
         }catch(msg){
             console.log("catch controller")
             return res.status(800).send(msg)
         }
-        // try{
-        //     const passFromDB = await app.db('histpassword')
-        //     .select('userId', 'password', 'dateTimeAlteration')
-        //     .where({userId: user.id})
-        //     console.log("antes ondb")
 
-        //     notExistsOnDb(passFromDB, user.password, "senha xsc")
-        //         .then(result => console.log('sucesso'+result))
-        //         .catch(erro => console.log("ERRO!", erro.message))
-
-
-        // }catch(e){
-        //     console.log("catch log")
-        //     return res.status(800).send(e)
-        // }
         console.log("nntes do salt")
         const saltRounds = 10
         bcrypt.hash(user.password, saltRounds, function(err, hash){
-            console.log("dentro do bcrypt")
-            delete user.confirmPassword
-            user.password = hash
-            return app.models.users.save(user, req, res)})
+            if(hash){
+                console.log("dentro do bcrypt")
+                delete user.confirmPassword
+                delete user.actualPassword
+                user.password = hash
+                return app.models.users.save(user, req, res)}
+            })
+            
     }
 
     const deleteController = async (req, res) => {

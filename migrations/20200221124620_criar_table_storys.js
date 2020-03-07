@@ -6,6 +6,7 @@ exports.up = function(knex, promise) {
         table.integer('userId').unsigned().references('id').inTable('users').notNull()
         table.dateTime('dateTimeStory').defaultTo(knex.fn.now())
         table.string('type', 1).notNull()
+        table.dateTime('deletedAt')
     } )
   
 };

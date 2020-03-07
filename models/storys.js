@@ -33,8 +33,8 @@ module.exports = app => {
 
     const deleteById = (story, req, res) => {
         app.db('storys')
-            .where({id: story.id}).first()
-            .del()
+            .update({deletedAt: new Date()})
+            .where({id: story.id})
             .then(_ => res.status(204).send())
             .catch(err => res.status(500).send(err))
 

@@ -22,7 +22,7 @@ module.exports = app => {
 
     const get = (req, res) => {
         app.db('contacts')
-            .select('id', 'name', 'idOwner', 'idTarget')
+            .select('id', 'name', 'idOwner', 'idTarget','deletedAt')
             .then(contacts => res.json(contacts))
             .catch(err => res.status(500).send(err))
 
@@ -31,7 +31,7 @@ module.exports = app => {
     const getById = (contact, req, res) => {
         
         app.db('contacts')
-            .select('id', 'name', 'idOwner', 'idTarget')
+            .select('id', 'name', 'idOwner', 'idTarget', 'deletedAt')
             .where({id: contact.id})
             .first()
             .then(contactb => res.json(contactb))
@@ -41,8 +41,8 @@ module.exports = app => {
 
     const deleteById = (contact, req, res) => {
         app.db('contacts')
-            .where({id: contact.id}).first()
-            .del()
+            .update({deletedAt: new Date()})
+            .where({id: contact.id})
             .then(_ => res.status(204).send())
             .catch(err => res.status(500).send(err))
 

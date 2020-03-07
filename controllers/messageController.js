@@ -13,21 +13,23 @@ module.exports = app => {
             existsOrError(message.message, 'Mensagem inválida')
             existsOrError(message.srcId, 'ID do remetente inválido')
             existsOrError(message.destId, 'ID do destinatário inválido')
-            existsOrError(message.statusSrc, 'Status do remetente inválido')
-            existsOrError(message.statusDest, 'Status do destinatário inválido')
+            // existsOrError(message.statusSrc, 'Status do remetente inválido')
+            // existsOrError(message.statusDest, 'Status do destinatário inválido')
 
 
             const srcFromDB = await app.db('users')
                 .where({id: message.srcId}).first()
             existsOrError(srcFromDB, 'Usuário remetente não existe')
 
-            const destFromDB = await app.db('users')
-                .where({id: message.destId}).first()
-            existsOrError(srcFromDB, 'Usuário destinatário não existe')
-
             const contactFromDB = await app.db('contacts')
                 .where({idOwner: message.srcId, idTarget: message.destId}).first()
             existsOrError(contactFromDB, 'O destinatário não é um contato cadastrado')
+
+            const destFromDB = await app.db('users')
+                .where({id: message.destId}).first()
+            existsOrError(destFromDB, 'Usuário destinatário não existe')
+
+            
             
         }catch(msg){
             return res.status(400).send(msg)
@@ -59,7 +61,7 @@ module.exports = app => {
         if(req.params.id) talk.id = req.params.id
 
         const messageFromDB = await app.db('messages')
-            .where({srcId: talk.srcId}).orWhere({destId: talk.destId}).first()
+            .where({srcId: talk.srcId, }).orWhere({destId: talk.destId}).first()
         try {
             existsOrError(messageFromDB, 'Não há mensagens a serem excluídas')
         }catch(msg){
