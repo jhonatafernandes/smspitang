@@ -2,7 +2,7 @@ const bcrypt = require('bcrypt-nodejs')
 
 module.exports = app => {
     const { existsOrError, notExistsOrError, equalsOrError} = app.models.validation
-    const { save, get, getById, deleteById} = app.models.storys
+    const { save, get, getById, deleteById, getByIdContact} = app.models.storys
 
 
     const saveController = async (req, res) => {
@@ -12,6 +12,12 @@ module.exports = app => {
         try{
             existsOrError(story.message, 'Mensagem não informada')
             existsOrError(story.type, 'Tipo não informado')
+            existsOrError(story.userId, 'ID não informado')
+
+            const userFromDB = await app.db('users')
+            .where({id: story.userId}).first()
+            existsOrError(userFromDB, 'ID de usuário inexistente')
+
 
         }catch(msg){
             return res.status(400).send(msg)
@@ -41,7 +47,7 @@ module.exports = app => {
         return app.models.storys.get(req, res)
     }
     
-    const getByIdContactController = async (req, res) => {
+    const getByIdController = async (req, res) => {
         //IMPLEMENTAR MAIS VALIDAÇÕES
         const story = { ...req.body }
         if(req.params.id) story.id = req.params.id
@@ -49,15 +55,30 @@ module.exports = app => {
             .where({id: story.id}).first()
 
         try {
-            existsOrError(storyFromDB, 'Contato inexistente')
+            existsOrError(storyFromDB, 'Story inexistente')
         }catch(msg){
             return res.status(400).send(msg)
         }
         return app.models.storys.getById(story, req, res)
     }
 
+    const getByIdContactController = async (req, res) => {
+        //IMPLEMENTAR MAIS VALIDAÇÕES
+        const story = { ...req.body }
+        if(req.params.id) story.id = req.params.id
+        const storyFromDB = await app.db('storys')
+            .where({userId: story.id}).first()
+
+        try {
+            existsOrError(storyFromDB, 'Sem stories!')
+        }catch(msg){
+            return res.status(400).send(msg)
+        }
+        return app.models.storys.getByIdContact(story, req, res)
+    }
 
 
 
-    return{ saveController, getController, getByIdContactController, deleteByIdController }
+
+    return{ saveController, getController, getByIdController, getByIdContactController, deleteByIdController }
 }

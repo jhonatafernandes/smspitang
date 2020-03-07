@@ -27,6 +27,16 @@ module.exports = app => {
             .catch(err => res.status(500).send(err))
 
     }
+    const getTalk = (message, req, res) => {
+
+        app.db('messages')
+        .select('message', 'srcId', 'destId', 'statusSrc', 'statusDest')
+        .where({srcId: message.id, destId: message.contact})
+        .orWhere({srcId: message.contact, destId: message.id})
+        .then(talk => res.json(talk))
+        .catch(err => res.status(500).send(err))
+
+    }
 
     const getById = (message, req, res) => {
         
@@ -62,20 +72,27 @@ module.exports = app => {
     const deleteTalk = (message, req, res) => {
         
         app.db('messages')
-        .where({srcId: message.id, destId: message.contact})
         .update({delSrc: 1})
-        .then(_ => res.status(204).send())
+        .where({srcId: message.id, destId: message.contact})
+        .then(_ => {
+            app.db('messages')
+            .update({delDest: 1})
+            .where({destId: message.id, srcId: message.contact})
+            .then(_ => res.status(204).send())
+            .catch(err => res.status(500).send(err))
+            
+        })
         .catch(err => res.status(500).send(err))
 
-        app.db('messages')
-        .where({destId: message.id, srcId: message.contact})
-        .update({delDest: 1})
-        .then(_ => res.status(204).send())
-        .catch(err => res.status(500).send(err))
+        // app.db('messages')
+        // .update({delDest: 1})
+        // .where({destId: message.id, srcId: message.contact})
+        // .then(_ => res.status(204).send())
+        // .catch(err => res.status(500).send(err))
         
 
     }
 
 
-    return{ save, get, getById, deleteById, deleteTalk }
+    return{ save, get, getById, deleteById, deleteTalk, getTalk }
 }

@@ -12,7 +12,7 @@ module.exports = app => {
 
     const get = (req, res) => {
         app.db('storys')
-            .select('id', 'message', 'userId', 'dateTimeStory', 'type')
+            .select('id', 'message', 'userId', 'dateTimeStory', 'type', 'deletedAt')
             .then(storys => res.json(storys))
             .catch(err => res.status(500).send(err))
 
@@ -21,8 +21,18 @@ module.exports = app => {
     const getById = (story, req, res) => {
         
         app.db('storys')
-            .select('id', 'message', 'userId', 'dateTimeStory', 'type')
-            .where({userId: story.userId}).first()
+            .select('id', 'message', 'userId', 'dateTimeStory', 'type', 'deletedAt')
+            .where({id: story.id}).first()
+            .then(storyb => res.json(storyb))
+            .catch(err => res.status(500).send(err))
+        
+    }
+
+    const getByIdContact = (story, req, res) => {
+        
+        app.db('storys')
+            .select('id', 'message', 'userId', 'dateTimeStory', 'type', 'deletedAt')
+            .where({userId: story.id})
             .then(storyb => res.json(storyb))
             .catch(err => res.status(500).send(err))
         
@@ -43,5 +53,5 @@ module.exports = app => {
 
 
 
-    return{ save, get, getById, deleteById}
+    return{ save, get, getById, getByIdContact, deleteById}
 }

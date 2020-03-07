@@ -18,4 +18,5 @@ module.exports = app => {
 
     app.route('/messages/talk/:id')
         .delete(app.controllers.messageController.deleteTalkController)
+        .get(app.controllers.messageController.getTalkController)
 }

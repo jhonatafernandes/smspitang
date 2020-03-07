@@ -61,7 +61,9 @@ module.exports = app => {
         if(req.params.id) talk.id = req.params.id
 
         const messageFromDB = await app.db('messages')
-            .where({srcId: talk.srcId, }).orWhere({destId: talk.destId}).first()
+            .where({srcId: talk.id, destId: talk.contact})
+            .orWhere({srcId: talk.contact, destId: talk.id})
+            .first()
         try {
             existsOrError(messageFromDB, 'Não há mensagens a serem excluídas')
         }catch(msg){
@@ -75,6 +77,13 @@ module.exports = app => {
     const getController = async (req, res) => {
         //IMPLEMENTAR MAIS VALIDAÇÕES
         return app.models.messages.get(req, res)
+    }
+
+    const getTalkController = async (req, res) => {
+        //IMPLEMENTAR MAIS VALIDAÇÕES
+        const message = { ...req.body }
+        if(req.params.id) message.id = req.params.id
+        return app.models.messages.getTalk(message, req, res)
     }
     
     const getByIdController = async (req, res) => {
@@ -95,5 +104,5 @@ module.exports = app => {
 
 
 
-    return{ saveController, getController, getByIdController, deleteByIdController, deleteTalkController }
+    return{ saveController, getController, getByIdController, deleteByIdController, deleteTalkController, getTalkController }
 }

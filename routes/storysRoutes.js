@@ -12,7 +12,10 @@ module.exports = app => {
     app.route('/storys/:id')
         //.all(app.config.passport.authenticate())
         //.put(app.controllers.storyController.saveController)
-        .get(app.controllers.storyController.getByIdContactController)
+        .get(app.controllers.storyController.getByIdController)
         //.delete(admin(app.controllers.storyController.deleteController))
         .delete(app.controllers.storyController.deleteByIdController)
+
+        app.route('/storys/contact/:id')
+            .get(app.controllers.storyController.getByIdContactController)
 }
