@@ -58,3 +58,5 @@ STORYS
     POST > enviar o json acima
     PUT > enviar o id na url e as alterações no Body
     DELETE > enviar o id na url
+
+MESSAGES
