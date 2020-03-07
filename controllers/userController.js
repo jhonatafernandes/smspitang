@@ -1,7 +1,7 @@
 const bcrypt = require('bcrypt')
 
 module.exports = app => {
-    const { existsOrError, notExistsOrError, equalsOrError, notExistsOnDb} = app.models.validation
+    const { existsOrError, notExistsOrError, equalsOrError, notExistsOnDb, falseOrError} = app.models.validation
     const { save, get, getById} = app.models.users
 
     // const encryptPassword = password => {
@@ -32,25 +32,6 @@ module.exports = app => {
                 return res.status(400).send(msg)
             }
 
-        }else{
-            try{
-                existsOrError(user.password, 'Senha não informada')
-                existsOrError(user.confirmPassword, 'Confirmação de senha inválida')
-                equalsOrError(user.password, user.confirmPassword, 'Senhas não conferem')
-    
-    
-                const passFromDB = await app.db('histpassword')
-                .select('userId', 'password', 'dateTimeAlteration')
-                .where({userId: user.id})
-                console.log("antes do ondb")
-                notExistsOnDb(passFromDB, user.password, 'Senha utilizada anteriormente')
-                
-            }catch(msg){
-                console.log("catch controller")
-                return res.status(800).send(msg)
-            }
-        
-
         }
         console.log("nntes do salt")
         const saltRounds = 10
@@ -59,15 +40,47 @@ module.exports = app => {
             delete user.confirmPassword
             user.password = hash
             return app.models.users.save(user, req, res)
-        });
-        
-      
-       
+        })
     }
+            
+        
+    const savePutController = async (req, res) => {
+        const user = { ...req.body }
+        if(req.params.id) user.id = req.params.id
 
 
+        try{
+            existsOrError(user.password, 'Senha não informada')
+            existsOrError(user.confirmPassword, 'Confirmação de senha inválida')
+            equalsOrError(user.password, user.confirmPassword, 'Senhas não conferem')
 
-   
+        }catch(msg){
+            console.log("catch controller")
+            return res.status(800).send(msg)
+        }
+        // try{
+        //     const passFromDB = await app.db('histpassword')
+        //     .select('userId', 'password', 'dateTimeAlteration')
+        //     .where({userId: user.id})
+        //     console.log("antes ondb")
+
+        //     notExistsOnDb(passFromDB, user.password, "senha xsc")
+        //         .then(result => console.log('sucesso'+result))
+        //         .catch(erro => console.log("ERRO!", erro.message))
+
+
+        // }catch(e){
+        //     console.log("catch log")
+        //     return res.status(800).send(e)
+        // }
+        console.log("nntes do salt")
+        const saltRounds = 10
+        bcrypt.hash(user.password, saltRounds, function(err, hash){
+            console.log("dentro do bcrypt")
+            delete user.confirmPassword
+            user.password = hash
+            return app.models.users.save(user, req, res)})
+    }
 
     const deleteController = async (req, res) => {
         const user = { ...req.body }
@@ -105,8 +118,5 @@ module.exports = app => {
         return app.models.users.getById(user, req, res)
     }
 
-
-
-
-    return{ saveController, getController, getByIdController, deleteController }
+    return{ saveController, getController, getByIdController, deleteController, savePutController }
 }

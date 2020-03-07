@@ -21,30 +21,46 @@ module.exports = app => {
     }
 
 
-    async function notExistsOnDb(passBd,password, msg){
-        try{
-            console.log("try")
-            existsOrError(passBd, msg)
-        }catch(msg){
-            console.log("catch")
-            return
-        }
-        console.log("antes for each")
-        passBd.forEach((userPass)=>{ 
-            console.log("dentro do for each")
-            bcrypt.compare(password, userPass.password, function(err, result) {
-                if(result){
-                    console.log(result)
-                    throw msg
-                }else{
-                    console.log(result)
-                    return
-                }
 
+     function  notExistsOnDb(passBd,password, msg){         
+        new Promise((resolve, reject) => {
+            passBd.forEach((userPass)=>{
+                bcrypt.compare(password, userPass.password).then(function(result) {
+                    if(result){
+                        console.log("entrou no reject")
+                        reject(new Error("ERRO"))                   
+                    }
+                });
             })
-        })
+
+            resolve("Deu certo");
+        });
+    }
+
+    // function notExistsOnDb(passBd,password, msg){
+    //     console.log("anres da promise")
+    //     new Promise((resolve, reject) => {
+    //         console.log("dentro da promise")
+    //         passBd.forEach((userPass)=>{
+    //             bcrypt.compare(password, userPass.password).then(function(result) {
+    //                 try{
+    //                     console.log("no try")
+    //                     falseOrError(result, "senha utilizada")
+    //                 }catch(msg){
+    //                     console.log("no catch")
+    //                     reject(new Error("Falha na geração"))
+
+    //                 }
+    //             });
+    //         })
         
+    //     })
+    // }
+
+    function falseOrError(value, msg){
+        if(value) throw msg
     }
     
-    return { existsOrError, notExistsOrError, equalsOrError, notExistsOnDb}
+    
+    return { existsOrError, notExistsOrError, equalsOrError, notExistsOnDb, falseOrError}
 }
