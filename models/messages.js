@@ -2,15 +2,7 @@
 module.exports = app => {
 
 
-    const save = async (message, req, res) => {
-    
-        
-            // app.db('messages')
-            //     .update(message)
-            //     .where({id: message.id})
-            //     .then(_ => res.status(204).send())
-            //     .catch(err => res.status(500).send(err))
-            
+    const save = async (message, req, res) => { 
     
         app.db('messages')
             .insert(message)
@@ -30,9 +22,13 @@ module.exports = app => {
     const getTalk = (message, req, res) => {
 
         app.db('messages')
-        .select('message', 'srcId', 'destId', 'statusSrc', 'statusDest')
-        .where({srcId: message.id, destId: message.contact})
-        .orWhere({srcId: message.contact, destId: message.id})
+        .select('message', 'srcId', 'destId', 'statusSrc', 'statusDest', 'delSrc', 'delDest')
+        .where({srcId: message.id, destId: message.contact, delSrc: null})
+    
+        .orWhere({srcId: message.contact, destId: message.id, delDest: null})
+
+        // .where({srcId: message.id, destId: message.contact, delSrc: !==1, delDest: !==1})
+        // .orWhere({srcId: message.contact, destId: message.id, delSrc: !==1, delDest: !==1})
         .then(talk => res.json(talk))
         .catch(err => res.status(500).send(err))
 
@@ -72,7 +68,7 @@ module.exports = app => {
     const deleteTalk = (message, req, res) => {
         
         app.db('messages')
-        .update({delSrc: 1})
+        .update({delSrc: 1, delDest: 1})
         .where({srcId: message.id, destId: message.contact})
         .then(_ => {
             app.db('messages')

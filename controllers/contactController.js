@@ -14,15 +14,21 @@ module.exports = app => {
                 existsOrError(contact.idTarget, 'Id do contato inválido')
                 
                 const ownerFromUsers = await app.db('users')
-                    .where({id: contact.idOwner}).first()
+                    .where({id: contact.idOwner})
+                    .whereNull('deletedAt')
+                    .first()
                 existsOrError(ownerFromUsers, 'Seu usuário não existe!')
 
                 const targetFromUsers = await app.db('users')
-                    .where({id: contact.idTarget}).first()
+                    .where({id: contact.idTarget})
+                    .whereNull('deletedAt')
+                    .first()
                 existsOrError(targetFromUsers, 'Usuário do contato não existe!')
     
                 const contactFromDB = await app.db('contacts')
-                    .where({idOwner: contact.idOwner, idTarget: contact.idTarget }).first()
+                    .where({idOwner: contact.idOwner, idTarget: contact.idTarget })
+                    .whereNull('deletedAt')
+                    .first()
     
                 if(!contact.id){
                     notExistsOrError(contactFromDB, 'Contato já cadastrado')
@@ -42,7 +48,9 @@ module.exports = app => {
         if(req.params.id) contact.id = req.params.id
 
         const contactFromDB = await app.db('contacts')
-            .where({id: contact.id}).first()
+            .where({id: contact.id})
+            .whereNull('deletedAt')
+            .first()
 
         try {
             existsOrError(contactFromDB, 'Contato inexistente')
@@ -57,13 +65,32 @@ module.exports = app => {
         //IMPLEMENTAR MAIS VALIDAÇÕES
         return app.models.contacts.get(req, res)
     }
+
+    const getContactController = async (req, res) => {
+         //IMPLEMENTAR MAIS VALIDAÇÕES
+         const contact = { ...req.body }
+         if(req.params.id) contact.id = req.params.id
+         const contactFromDB = await app.db('contacts')
+             .where({idOwner: contact.id})
+             .whereNull('deletedAt')
+             .first()
+ 
+         try {
+             existsOrError(contactFromDB, 'Sem Contatos')
+         }catch(msg){
+             return res.status(400).send(msg)
+         }
+         return app.models.contacts.getContact(contact, req, res)
+    }
     
     const getByIdController = async (req, res) => {
         //IMPLEMENTAR MAIS VALIDAÇÕES
         const contact = { ...req.body }
         if(req.params.id) contact.id = req.params.id
         const contactFromDB = await app.db('contacts')
-            .where({id: contact.id}).first()
+            .where({id: contact.id})
+            .whereNull('deletedAt')
+            .first()
 
         try {
             existsOrError(contactFromDB, 'Contato inexistente')
@@ -76,5 +103,5 @@ module.exports = app => {
 
 
 
-    return{ saveController, getController, getByIdController, deleteController }
+    return{ saveController, getController, getByIdController, getContactController, deleteController }
 }

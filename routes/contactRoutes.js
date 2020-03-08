@@ -15,4 +15,7 @@ module.exports = app => {
         .get(app.controllers.contactController.getByIdController)
         //.delete(admin(app.controllers.contactController.deleteController))
         .delete(app.controllers.contactController.deleteController)
+
+        app.route('/contacts/user/:id')
+            .get(app.controllers.contactController.getContactController)
 }
