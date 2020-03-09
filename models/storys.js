@@ -13,6 +13,7 @@ module.exports = app => {
     const get = (req, res) => {
         app.db('storys')
             .select('id', 'message', 'userId', 'dateTimeStory', 'type', 'deletedAt')
+            .whereNull('deletedAt')
             .then(storys => res.json(storys))
             .catch(err => res.status(500).send(err))
 
@@ -22,7 +23,9 @@ module.exports = app => {
         
         app.db('storys')
             .select('id', 'message', 'userId', 'dateTimeStory', 'type', 'deletedAt')
-            .where({id: story.id}).first()
+            .where({id: story.id})
+            .whereNull('deletedAt')
+            .first()
             .then(storyb => res.json(storyb))
             .catch(err => res.status(500).send(err))
         
@@ -33,6 +36,8 @@ module.exports = app => {
         app.db('storys')
             .select('id', 'message', 'userId', 'dateTimeStory', 'type', 'deletedAt')
             .where({userId: story.id})
+            .whereNull('deletedAt')
+            .first()
             .then(storyb => res.json(storyb))
             .catch(err => res.status(500).send(err))
         
@@ -45,6 +50,8 @@ module.exports = app => {
         app.db('storys')
             .update({deletedAt: new Date()})
             .where({id: story.id})
+            .whereNull('deletedAt')
+            .first()
             .then(_ => res.status(204).send())
             .catch(err => res.status(500).send(err))
 

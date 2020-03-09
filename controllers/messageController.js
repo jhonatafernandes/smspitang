@@ -18,15 +18,21 @@ module.exports = app => {
 
 
             const srcFromDB = await app.db('users')
-                .where({id: message.srcId}).first()
+                .where({id: message.srcId})
+                .whereNull('deletedAt')
+                .first()
             existsOrError(srcFromDB, 'Usuário remetente não existe')
 
             const contactFromDB = await app.db('contacts')
-                .where({idOwner: message.srcId, idTarget: message.destId}).first()
+                .where({idOwner: message.srcId, idTarget: message.destId})
+                .whereNull('deletedAt')
+                .first()
             existsOrError(contactFromDB, 'O destinatário não é um contato cadastrado')
 
             const destFromDB = await app.db('users')
-                .where({id: message.destId}).first()
+                .where({id: message.destId})
+                .whereNull('deletedAt')
+                .first()
             existsOrError(destFromDB, 'Usuário destinatário não existe')
 
             
@@ -43,7 +49,8 @@ module.exports = app => {
         if(req.params.id) message.id = req.params.id
 
         const messageFromDB = await app.db('messages')
-            .where({id: message.id}).first()
+            .where({id: message.id})
+            .first()
 
         try {
             existsOrError(messageFromDB, 'mensagem inexistente')

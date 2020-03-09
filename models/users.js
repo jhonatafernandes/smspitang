@@ -14,6 +14,7 @@ module.exports = app => {
                 app.db('users')
                 .update(user)
                 .where({id: user.id})
+                .whereNull('deletedAt')
                 .then(async _ => {
                     app.db('histpassword')
                     .insert({userId: user.id, password: user.password})
@@ -53,6 +54,7 @@ module.exports = app => {
     const get = (req, res) => {
         app.db('users')
             .select('id', 'username', 'email', 'admin', 'imageUrl', 'deletedAt')
+            .whereNull('deletedAt')
             .then(users => res.json(users))
             .catch(err => res.status(500).send(err))
 
@@ -63,6 +65,7 @@ module.exports = app => {
         app.db('users')
             .select('id', 'username', 'email', 'admin', 'imageUrl', 'deletedAt')
             .where({id: user.id})
+            .whereNull('deletedAt')
             .first()
             .then(userb => res.json(userb))
             .catch(err => res.status(500).send(err))
@@ -73,6 +76,7 @@ module.exports = app => {
         app.db('users')
             .update({deletedAt: new Date()})
             .where({id: user.id})
+            .whereNull('deletedAt')
             .then(_ => res.status(204).send())
             .catch(err => res.status(500).send(err))
 
