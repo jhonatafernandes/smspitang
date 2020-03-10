@@ -1,16 +1,12 @@
-const schedule = require('node-schedule')
+const cron = require('node-cron')
 
 module.exports = app => {
 
-    schedule.scheduleJob('*1/ * * * *', async function() {
-        console.log("to funcionando")
-        const storys = app.db('storys')
-            .whereNull('deletedAt')
+    cron.schedule("* * * * *", () => {
+        
 
-        if(storys){
-            console.log(storys)
-            
-        }
+
+    
     })
 
 } 
