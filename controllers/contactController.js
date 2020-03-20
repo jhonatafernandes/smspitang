@@ -1,103 +1,103 @@
 const bcrypt = require('bcrypt-nodejs')
 
 module.exports = app => {
-    const { existsOrError, notExistsOrError, equalsOrError} = app.models.validation
-    const { save, get, getById, deleteById} = app.models.contacts
-
+    //const { userOwner, existsOrError12 } = app.models.contactService
+    const { existsOrError, notExistsOrError, equalsOrError, userVerifyFunction, targetVerifyFunction,
+         contactVerifyFunction, contactVerifyDelFunction, contactVerifyUserFunction, userVerifyIdFunction} = app.models.contactService
+    const { save, get, getById, deleteById} = app.repository.contactsRepository
 
     const saveController = async (req, res) => {
         const contact = { ...req.body }
         if(req.params.id) contact.id = req.params.id
         if(!contact.id){
+        
             try{
                 existsOrError(contact.idOwner, 'Seu id é inválido')
-                existsOrError(contact.idTarget, 'Id do contato inválido')
-                
-                const ownerFromUsers = await app.db('users')
-                    .where({id: contact.idOwner})
-                    .whereNull('deletedAt')
-                    .first()
-                existsOrError(ownerFromUsers, 'Seu usuário não existe!')
+                existsOrError(contact.idTarget, 'Id do contato inválido') 
 
-                const targetFromUsers = await app.db('users')
-                    .where({id: contact.idTarget})
-                    .whereNull('deletedAt')
-                    .first()
-                existsOrError(targetFromUsers, 'Usuário do contato não existe!')
-    
-                const contactFromDB = await app.db('contacts')
-                    .where({idOwner: contact.idOwner, idTarget: contact.idTarget })
-                    .whereNull('deletedAt')
-                    .first()
-    
-                if(!contact.id){
-                    notExistsOrError(contactFromDB, 'Contato já cadastrado')
-                }
+                let userVerify = null
+                let targetVerify = null
+                let contactVerify = null
+
+                await userVerifyFunction(contact).then(ownerFromUsers => userVerify = ownerFromUsers)
+                existsOrError(userVerify, 'Seu usuário não existe!')
+
+                await targetVerifyFunction(contact).then(targetFromUsers => targetVerify = targetFromUsers )
+                existsOrError(targetVerify, 'Usuário do contato não existe!')
+
+                await contactVerifyFunction(contact).then(contactFromContacts => contactVerify = contactFromContacts )
+                notExistsOrError(contactVerify, 'Contato já cadastrado!')
+
             }catch(msg){
                 return res.status(400).send(msg)
             }
-
         }
-        
-        return app.models.contacts.save(contact, req, res)
-       
+        return app.repository.contactsRepository.save(contact, req, res)  
     }
 
+
+
     const deleteController = async (req, res) => {
+
         const contact = { ...req.body }
         if(req.params.id) contact.id = req.params.id
 
-        const contactFromDB = await app.db('contacts')
-            .where({id: contact.id})
-            .whereNull('deletedAt')
-            .first()
-
         try {
-            existsOrError(contactFromDB, 'Contato inexistente')
+            let contactDelVerify = null
+            await contactVerifyDelFunction(contact).then(contactFromDB => contactDelVerify = contactFromDB )
+            existsOrError(contactDelVerify, 'Contato inexistente')
+
         }catch(msg){
             return res.status(400).send(msg)
         }
-        return app.models.contacts.deleteById(contact, req, res)
+
+        return app.repository.contactsRepository.deleteById(contact, req, res)
         
     }
 
     const getController = async (req, res) => {
         //IMPLEMENTAR MAIS VALIDAÇÕES
-        return app.models.contacts.get(req, res)
+        return app.repository.contactsRepository.get(req, res)
     }
 
     const getContactController = async (req, res) => {
          //IMPLEMENTAR MAIS VALIDAÇÕES
+         let contactUserVerify = null
+         let userVerify = null
          const contact = { ...req.body }
          if(req.params.id) contact.id = req.params.id
-         const contactFromDB = await app.db('contacts')
-             .where({idOwner: contact.id})
-             .whereNull('deletedAt')
-             .first()
+         
  
          try {
-             existsOrError(contactFromDB, 'Sem Contatos')
+            await userVerifyIdFunction(contact).then(ownerFromUsers => userVerify = ownerFromUsers)
+            existsOrError(userVerify, 'Seu usuário não existe!')
+
+            await contactVerifyUserFunction(contact).then(contactFromContacts => contactVerify = contactFromContacts )
+            existsOrError(contactVerify, 'Sem contatos!')
+
          }catch(msg){
              return res.status(400).send(msg)
          }
-         return app.models.contacts.getContact(contact, req, res)
+
+         return app.repository.contactsRepository.getContact(contact, req, res)
     }
     
     const getByIdController = async (req, res) => {
         //IMPLEMENTAR MAIS VALIDAÇÕES
         const contact = { ...req.body }
         if(req.params.id) contact.id = req.params.id
-        const contactFromDB = await app.db('contacts')
-            .where({id: contact.id})
-            .whereNull('deletedAt')
-            .first()
 
         try {
-            existsOrError(contactFromDB, 'Contato inexistente')
+            let userVerify = null 
+            console.log("antes await")
+            await userVerifyIdFunction(contact).then(ownerFromUsers => userVerify = ownerFromUsers)
+            console.log(userVerify)
+            existsOrError(userVerify, 'Usuário informado não existe!')
+
         }catch(msg){
             return res.status(400).send(msg)
         }
-        return app.models.contacts.getById(contact, req, res)
+        return app.repository.contactsRepository.getById(contact, req, res)
     }
 
 

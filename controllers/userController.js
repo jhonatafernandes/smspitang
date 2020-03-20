@@ -1,8 +1,8 @@
 const bcrypt = require('bcrypt')
 
 module.exports = app => {
-    const { existsOrError, notExistsOrError, equalsOrError, notExistsOnDb, falseOrError, validatePassword} = app.models.validation
-    const { save, get, getById} = app.models.users
+    const { existsOrError, notExistsOrError, equalsOrError} = app.models.userService
+    const { save, get, getById} = app.repository.usersRepository
 
     // const encryptPassword = password => {
     //     const salt = bcrypt.genSaltSync(10)
@@ -44,7 +44,7 @@ module.exports = app => {
             console.log("dentro do bcrypt")
             delete user.confirmPassword
             user.password = hash
-            return app.models.users.save(user, req, res)
+            return app.repository.usersRepository.save(user, req, res)
         })
     }
             
@@ -52,40 +52,16 @@ module.exports = app => {
     const savePutController = async (req, res) => {
         const user = { ...req.body }
         if(req.params.id) user.id = req.params.id
-
+        const userFromDB = await app.db('users')
+                .where({id: user.id}).first()
 
         try{
 
             if(user.actualPassword){
-                const userFromDB = await app.db('users')
-                .where({id: user.id}).first()
-                existsOrError(userFromDB, 'Usuário não existe')
-                await validatePassword(user.actualPassword, userFromDB.password, "mensagem qualquer")
-                .then(function(ok) {})
-
-                .catch(no => {
-                    console.log("to no catch")
-                    throw "senha atual incorreta!"
-                })
                 existsOrError(user.password, 'Senha não informada')
                 existsOrError(user.confirmPassword, 'Confirmação de senha inválida')
                 equalsOrError(user.password, user.confirmPassword, 'Senhas não conferem')
-
-
-                const passFromDB = await app.db('histpassword')
-                .select('userId', 'password', 'dateTimeAlteration')
-                .where({userId: user.id})
-
-
-                console.log("antes ondb")
-                await notExistsOnDb(passFromDB, user.password, "senha xsc")
-                .then(function(ok) {
-                })
-
-                .catch(no => {
-                    console.log("to no catch ondb")
-                    throw "senha já utilzada!"
-                })
+                existsOrError(userFromDB, 'Usuário não existe')
                 
                 
             }
@@ -105,6 +81,7 @@ module.exports = app => {
             return res.status(800).send(msg)
         }
 
+
         console.log("nntes do salt")
         const saltRounds = 10
         bcrypt.hash(user.password, saltRounds, function(err, hash){
@@ -113,7 +90,7 @@ module.exports = app => {
                 delete user.confirmPassword
                 delete user.actualPassword
                 user.password = hash
-                return app.models.users.save(user, req, res)}
+                return app.repository.usersRepository.save(user, req, res)}
             })
             
     }
@@ -130,13 +107,13 @@ module.exports = app => {
         }catch(msg){
             return res.status(400).send(msg)
         }
-        return app.models.users.deleteById(user, req, res)
+        return app.repository.usersRepository.deleteById(user, req, res)
         
     }
 
     const getController = async (req, res) => {
         //IMPLEMENTAR MAIS VALIDAÇÕES
-        return app.models.users.get(req, res)
+        return app.repository.usersRepository.get(req, res)
     }
     
     const getByIdController = async (req, res) => {
@@ -151,7 +128,7 @@ module.exports = app => {
         }catch(msg){
             return res.status(400).send(msg)
         }
-        return app.models.users.getById(user, req, res)
+        return app.repository.usersRepository.getById(user, req, res)
     }
 
     return{ saveController, getController, getByIdController, deleteController, savePutController }

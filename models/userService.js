@@ -1,4 +1,5 @@
-const bcrypt = require('bcrypt')
+
+
 module.exports = app => {
     function existsOrError(value, msg){
         if(!value) throw msg
@@ -20,6 +21,7 @@ module.exports = app => {
         if(valueA !== valueB) throw msg
     }
 
+    
     
     return { existsOrError, notExistsOrError, equalsOrError}
 }

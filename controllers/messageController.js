@@ -1,8 +1,8 @@
 const bcrypt = require('bcrypt-nodejs')
 
 module.exports = app => {
-    const { existsOrError, notExistsOrError, equalsOrError} = app.models.validation
-    const { save, get, getById, deleteById} = app.models.messages
+    const { existsOrError, notExistsOrError, equalsOrError} = app.models.messageService
+    const { save, get, getById, deleteById} = app.repository.messagesRepository
 
 
     const saveController = async (req, res) => {
@@ -40,7 +40,7 @@ module.exports = app => {
         }catch(msg){
             return res.status(400).send(msg)
         }
-        return app.models.messages.save(message, req, res)
+        return app.repository.messagesRepository.save(message, req, res)
        
     }
 
@@ -59,7 +59,7 @@ module.exports = app => {
         }
 
         
-        return app.models.messages.deleteById(message, req, res)
+        return app.repository.messagesRepository.deleteById(message, req, res)
         
     }
 
@@ -76,21 +76,21 @@ module.exports = app => {
         }catch(msg){
             return res.status(400).send(msg)
         }
-        return app.models.messages.deleteTalk(talk, req, res)
+        return app.repository.messagesRepository.deleteTalk(talk, req, res)
     }
 
 
 
     const getController = async (req, res) => {
         //IMPLEMENTAR MAIS VALIDAÇÕES
-        return app.models.messages.get(req, res)
+        return app.repository.messagesRepository.get(req, res)
     }
 
     const getTalkController = async (req, res) => {
         //IMPLEMENTAR MAIS VALIDAÇÕES
         const message = { ...req.body }
         if(req.params.id) message.id = req.params.id
-        return app.models.messages.getTalk(message, req, res)
+        return app.repository.messagesRepository.getTalk(message, req, res)
     }
     
     const getByIdController = async (req, res) => {
@@ -105,7 +105,7 @@ module.exports = app => {
         }catch(msg){
             return res.status(400).send(msg)
         }
-        return app.models.messages.getById(message, req, res)
+        return app.repository.messagesRepository.getById(message, req, res)
     }
 
 

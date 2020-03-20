@@ -1,8 +1,8 @@
 const bcrypt = require('bcrypt-nodejs')
 
 module.exports = app => {
-    const { existsOrError, notExistsOrError, equalsOrError} = app.models.validation
-    const { save, get, getById, deleteById, getByIdContact} = app.models.storys
+    const { existsOrError, notExistsOrError, equalsOrError} = app.models.storyService
+    const { save, get, getById, deleteById, getByIdContact} = app.repository.storysRepository
 
 
     const saveController = async (req, res) => {
@@ -16,13 +16,14 @@ module.exports = app => {
 
             const userFromDB = await app.db('users')
             .where({id: story.userId}).first()
+            .whereNull('deletedAt')
             existsOrError(userFromDB, 'ID de usuário inexistente')
 
 
         }catch(msg){
             return res.status(400).send(msg)
         }
-        return app.models.storys.save(story, req, res)
+        return app.repository.storysRepository.save(story, req, res)
        
     }
 
@@ -38,13 +39,13 @@ module.exports = app => {
         }catch(msg){
             return res.status(400).send(msg)
         }
-        return app.models.storys.deleteById(story, req, res)
+        return app.repository.storysRepository.deleteById(story, req, res)
         
     }
 
     const getController = async (req, res) => {
         //IMPLEMENTAR MAIS VALIDAÇÕES
-        return app.models.storys.get(req, res)
+        return app.repository.storysRepository.get(req, res)
     }
     
     const getByIdController = async (req, res) => {
@@ -59,7 +60,7 @@ module.exports = app => {
         }catch(msg){
             return res.status(400).send(msg)
         }
-        return app.models.storys.getById(story, req, res)
+        return app.repository.storysRepository.getById(story, req, res)
     }
 
     const getByIdContactController = async (req, res) => {
@@ -74,7 +75,7 @@ module.exports = app => {
         }catch(msg){
             return res.status(400).send(msg)
         }
-        return app.models.storys.getByIdContact(story, req, res)
+        return app.repository.storysRepository.getByIdContact(story, req, res)
     }
 
 
