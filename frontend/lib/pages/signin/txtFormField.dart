@@ -18,11 +18,11 @@ class TxtFormField extends StatelessWidget {
               labelStyle: TextStyle(
                 color: Colors.black,
                 fontWeight: FontWeight.w400,
-                fontSize: 14,
+                fontSize: 10,
                 )
               ),
             style: TextStyle(
-              fontSize: 16
+              fontSize: 10
             ),
     );
   }

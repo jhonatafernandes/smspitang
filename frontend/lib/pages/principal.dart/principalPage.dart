@@ -1,6 +1,7 @@
 // import 'package:flutter_icons/flutter_icons.dart';
 
 import 'package:flutter/material.dart';
+import 'package:frontSmsPitangWeb/pages/signin/txtFormField.dart';
 
 
 class PrincipalPage extends StatefulWidget {
@@ -41,21 +42,98 @@ class _PrincipalPageState extends State<PrincipalPage> {
                           children: <Widget>[
                             SizedBox(
                               width: 500,
-                              height: 40,
+                              height: 55,
                               child: Container(
                                 color: Colors.grey[700],
                                 child: Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: <Widget>[
-                                      Text("kkk"),
-                                      Text("1"),
-                                      Text("2"),
-                                      Text("3")
+                                      Container(
+                                        margin: EdgeInsets.symmetric(
+                                          horizontal: 10,
+                                          vertical: 10,
+                                        ),
+                                        width: 40.0,
+                                        height: 40.0,
+                                        decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            image: DecorationImage(
+                                                fit: BoxFit.fill,
+                                                image: new NetworkImage(
+                                                    "https://i.imgur.com/BoN9kdC.png")
+                                            )
+                                        )),
+                                      Container(
+                                        child: Row(
+                                          children: <Widget>[
+                                            Container(
+                                              padding: const EdgeInsets.only(
+                                                left: 8.0,
+                                                right: 8.0),
+                                              child: SizedBox(
+                                                child: Icon(Icons.party_mode, color: Colors.white),
+
+                                              )
+                                            ),
+                                            Container(
+                                              padding: const EdgeInsets.only(
+                                                left: 8.0,
+                                                right: 8.0),
+                                              child: SizedBox(
+                                                child: Icon(Icons.chat, color: Colors.white),
+
+                                              )
+                                            ),
+                                            Container(
+                                              padding: const EdgeInsets.only(
+                                                left: 8.0,
+                                                right: 8.0),
+                                              child: SizedBox(
+                                                child: Icon(Icons.more_vert, color: Colors.white),
+
+                                              )
+                                            ),
+
+                                          ],
+                                        )
+                                      )
                                       
                                     ],
                                   ),
                               )
-                            )
+                            ),
+                            Container(
+                              color: Colors.red,
+                              width: 500,
+                              height: 40,
+                              child: SizedBox.expand(
+                                child: Container(
+                                  color: Colors.black,
+                                  margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                  child: Row(
+                                    children: <Widget>[
+                                      Container(
+                                        padding: const EdgeInsets.only(
+                                          left: 8.0,
+                                          right: 8.0),
+                                        child: SizedBox(
+                                          child: Icon(Icons.more_vert, color: Colors.white),
+
+                                        )
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                          top: 8.0,
+                                          bottom: 8,
+                                          ),
+                                        child: TxtFormField('Email', false),
+                                      ),
+
+                                    ],
+                                    
+                                  ),
+                                )
+                              ))
                             
                           ]
                         ),
@@ -63,13 +141,21 @@ class _PrincipalPageState extends State<PrincipalPage> {
                           children: <Widget>[
                             SizedBox(
                               width: 750,
-                              height: 40,
+                              height: 55,
                               child: Container(
                                 color: Colors.grey[700],
                                 child: Row(
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     children: <Widget>[
-                                      Text("kkk"),
+                                      Container(
+                                              padding: const EdgeInsets.only(
+                                                left: 8.0,
+                                                right: 8.0),
+                                              child: SizedBox(
+                                                child: Icon(Icons.more_vert, color: Colors.white),
+
+                                              )
+                                            ),
                                       
                                       
                                     ],
