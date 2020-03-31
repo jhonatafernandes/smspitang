@@ -34,6 +34,16 @@ abstract  class UsersModelBase with Store{
    String get getEmail => email;
 
   @observable
+  String username;
+  @action
+  changeUsername(String value) {
+    username = value;
+    print(username);
+  }
+  @computed
+   String get getUsername => username;
+
+  @observable
   String password;
   @action
   changePassword(String value){
@@ -42,7 +52,16 @@ abstract  class UsersModelBase with Store{
   }
   @computed
   String get pass => password;
-  
+
+  @observable
+  String confirmPassword;
+  @action
+  changeConfirmPassword(String value){
+    confirmPassword = value;
+    print(confirmPassword);
+  }
+  @computed
+  String get confirmPass => confirmPassword;
 
   @observable
   Exception error;
@@ -78,6 +97,37 @@ abstract  class UsersModelBase with Store{
     }
   }
 
+
+  @action
+  signup(BuildContext context) async{
+
+    
+     try{
+
+      if(validatePassword() != null){
+        return errorText = validatePassword();
+      } 
+
+      if( validateConfirmPassword() != null){
+        return errorText = validateConfirmPassword();
+      }
+
+      response = await LoginApi.signup(username, getEmail, pass, confirmPass);
+
+      if(response.ok){
+        return push(context, HomePage());
+      }
+      if(response.msg != null){
+        return _alert(context, response.msg);
+
+      }
+
+    }catch(e){
+      error = e;
+      return response.msg;
+    }
+  }
+
   String validateEmail(){
     print("kkkkk");
     if (email== null || email.isEmpty) {
@@ -94,6 +144,16 @@ abstract  class UsersModelBase with Store{
     }
     if (password.length < 8) {
       return "A senha precisa ter pelo menos 8 dígitos";
+    }
+    return null;
+  }
+
+  String validateConfirmPassword(){
+    if (confirmPassword.isEmpty || confirmPassword == null ) {
+      return "Digite a confirmação de senha";
+    }
+    if (password != confirmPassword) {
+      return "As senhas precisam ser iguais";
     }
     return null;
   }

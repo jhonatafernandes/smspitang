@@ -8,47 +8,63 @@ module.exports = app => {
     // }
 
     const save = async (user, req, res) => {
+        
 
         if(user.id){
             try{
+                const response = { response: 'Usuário salvo com sucesso!' }
                 app.db('users')
                 .update(user)
                 .where({id: user.id})
                 .whereNull('deletedAt')
                 .then(async _ => {
-                    app.db('histpassword')
-                    .insert({userId: user.id, password: user.password})
-                    .then(_ => res.status(204).send())
-                    .catch(err => res.status(500).send(err))
-                    
 
+                    savePassword(user)
+                    res.status(204).json(response)
                 })
-                .catch(err => res.status(500).send(err))
-                
-            }catch(err){
-                err => res.status(500).send(err)
-
+                .catch(err => {
+                    const error = { error: err }
+                    res.status(500).json(error)
+                    }
+                )
             }
+            catch(err){
+                const error = { error: err }
+                res.status(500).json(error)
+
+                }
+
             
         }else{
-           
+            const response = { response: 'Usuário cadastrado com sucesso!' }
+
+                console.log("ants db")
                 app.db('users')
                 .insert(user)
                 .then(async _ => {
-                    const userFromDB = await app.db('users')
-                    .where({email: user.email}).first()
-                    app.db('histpassword')
-                    .insert({userId: userFromDB.id, password: user.password})
-                    .then(_ => res.status(204).send())
-                    .catch(err => res.status(500).send(err))
-                    
+                    savePassword(user)
+                    res.status(291).json(response)
 
-                })
-                .catch(err => res.status(500).send(err))
-
-        }
+                    })
+                .catch(err => {
+                    const error = { error: err }
+                    res.status(500).json(error)
+                }
+                    )
             
-        
+                }
+    }
+
+    const savePassword = async(user) =>{
+
+        const userFromDB = await app.db('users')
+            .where({ email: user.email }).first()
+
+        app.db('histpassword')
+            .insert({ userId: userFromDB.id, password: userFromDB.password })
+            .then(_ => console.log("Senha salva"))
+            .catch(err => console.log("senha não salva"))
+
     }
 
     const get = (req, res) => {

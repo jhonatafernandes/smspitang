@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:frontWeb/pages/signup/page_signup.dart';
 import 'package:frontWeb/pages/users/users_model.dart';
-import 'package:frontWeb/utils/nav.dart';
 import 'package:frontWeb/widgets/text_field.dart';
 
-class ListViewLogin extends StatelessWidget {
+class ListViewSignup extends StatelessWidget {
 
   bool remember = false;
 
@@ -22,6 +20,21 @@ class ListViewLogin extends StatelessWidget {
                     return  TextField(
                     onChanged: controller.changeEmail,
                     decoration: InputDecoration(
+                      labelText: "Username",
+                      
+                      
+
+                    ),
+                    );
+
+                  } 
+              ),
+              SizedBox(height: 10,),
+              Observer(
+                  builder: (_){
+                    return  TextField(
+                    onChanged: controller.changeEmail,
+                    decoration: InputDecoration(
                       labelText: "Email",
                       
                       
@@ -31,6 +44,7 @@ class ListViewLogin extends StatelessWidget {
 
                   } 
               ),
+              SizedBox(height: 10,),
                Observer(
                   builder: (_){
                     return  TextField(
@@ -48,6 +62,20 @@ class ListViewLogin extends StatelessWidget {
                   } 
               ),
               SizedBox(height: 10,),
+              Observer(
+                  builder: (_){
+                    return  TextField(
+                    onChanged: controller.changePassword,
+                    obscureText: true,
+                    decoration: InputDecoration(
+                      labelText: "Confirm Password",
+                      errorText: controller.getErrorText,
+
+                    ),
+                    );
+
+                  } 
+              ),
               SizedBox(height: 10,),
               Row(
                   mainAxisAlignment: MainAxisAlignment.start,
@@ -63,7 +91,7 @@ class ListViewLogin extends StatelessWidget {
                       );
                      }
                     ),
-                    Text('Remember me')
+                    Text('Accept the terms of service')
                     ],
               ),
               SizedBox(height: 20,),
@@ -73,8 +101,8 @@ class ListViewLogin extends StatelessWidget {
                 return RaisedButton(
         
                   padding: EdgeInsets.all(16),
-                  onPressed: () => controller.login(context),
-                  child: Text("SIGN IN",
+                  onPressed: () => controller.signup(context),
+                  child: Text("SIGN UP",
                     style: TextStyle(
                       fontSize: 18,
                       color: Colors.white,
@@ -84,45 +112,16 @@ class ListViewLogin extends StatelessWidget {
                   color: Colors.green,
                 );
 
-              }),
-              SizedBox(height: 10,),
-              _buttonSignup(context),
+              })
 
               ],
           );
   }
-
-  
-
-  RaisedButton _buttonSignup(BuildContext context) {
-
-    return RaisedButton(
-
-      padding: EdgeInsets.all(16),
-      onPressed: () => {
-        push(context, PageSignup())
-      },
-      child: Text("SIGN UP",
-        style: TextStyle(
-          fontSize: 18,
-          color: Colors.grey,
-          fontWeight: FontWeight.bold,
-        )
-      ),
-      color: Colors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(0.0),
-        side: BorderSide(color: Colors.grey)
-
-      ),
-      );
-  }
-
  
 
   Text _textLogin() {
     return Text(
-      "Login",
+      "SIGN UP",
       style: TextStyle(
         color: Color(0xffffc801),
         fontSize: 25,

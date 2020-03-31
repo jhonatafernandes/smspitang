@@ -16,7 +16,7 @@ module.exports = app => {
         if(req.params.id) user.id = req.params.id
         if(!user.id){
             try{
-                existsOrError(user.username, 'Nome não informado')
+                existsOrError(user.username, 'Username não informado')
                 existsOrError(user.email, 'Email não informado')
                 existsOrError(user.password, 'Senha não informada')
                 existsOrError(user.confirmPassword, 'Confirmação de senha inválida')
@@ -34,7 +34,8 @@ module.exports = app => {
 
                 
             }catch(msg){
-                return res.status(400).send(msg)
+                const response = {response: msg}
+                return res.status(400).json(response)
             }
 
         }

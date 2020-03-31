@@ -19,11 +19,23 @@ mixin _$UsersModel on UsersModelBase, Store {
   @override
   String get getEmail =>
       (_$getEmailComputed ??= Computed<String>(() => super.getEmail)).value;
+  Computed<String> _$getUsernameComputed;
+
+  @override
+  String get getUsername =>
+      (_$getUsernameComputed ??= Computed<String>(() => super.getUsername))
+          .value;
   Computed<String> _$passComputed;
 
   @override
   String get pass =>
       (_$passComputed ??= Computed<String>(() => super.pass)).value;
+  Computed<String> _$confirmPassComputed;
+
+  @override
+  String get confirmPass =>
+      (_$confirmPassComputed ??= Computed<String>(() => super.confirmPass))
+          .value;
   Computed<String> _$getErrorTextComputed;
 
   @override
@@ -82,6 +94,23 @@ mixin _$UsersModel on UsersModelBase, Store {
     }, _$emailAtom, name: '${_$emailAtom.name}_set');
   }
 
+  final _$usernameAtom = Atom(name: 'UsersModelBase.username');
+
+  @override
+  String get username {
+    _$usernameAtom.context.enforceReadPolicy(_$usernameAtom);
+    _$usernameAtom.reportObserved();
+    return super.username;
+  }
+
+  @override
+  set username(String value) {
+    _$usernameAtom.context.conditionallyRunInAction(() {
+      super.username = value;
+      _$usernameAtom.reportChanged();
+    }, _$usernameAtom, name: '${_$usernameAtom.name}_set');
+  }
+
   final _$passwordAtom = Atom(name: 'UsersModelBase.password');
 
   @override
@@ -97,6 +126,23 @@ mixin _$UsersModel on UsersModelBase, Store {
       super.password = value;
       _$passwordAtom.reportChanged();
     }, _$passwordAtom, name: '${_$passwordAtom.name}_set');
+  }
+
+  final _$confirmPasswordAtom = Atom(name: 'UsersModelBase.confirmPassword');
+
+  @override
+  String get confirmPassword {
+    _$confirmPasswordAtom.context.enforceReadPolicy(_$confirmPasswordAtom);
+    _$confirmPasswordAtom.reportObserved();
+    return super.confirmPassword;
+  }
+
+  @override
+  set confirmPassword(String value) {
+    _$confirmPasswordAtom.context.conditionallyRunInAction(() {
+      super.confirmPassword = value;
+      _$confirmPasswordAtom.reportChanged();
+    }, _$confirmPasswordAtom, name: '${_$confirmPasswordAtom.name}_set');
   }
 
   final _$errorAtom = Atom(name: 'UsersModelBase.error');
@@ -140,6 +186,13 @@ mixin _$UsersModel on UsersModelBase, Store {
     return _$loginAsyncAction.run(() => super.login(context));
   }
 
+  final _$signupAsyncAction = AsyncAction('signup');
+
+  @override
+  Future signup(BuildContext context) {
+    return _$signupAsyncAction.run(() => super.signup(context));
+  }
+
   final _$UsersModelBaseActionController =
       ActionController(name: 'UsersModelBase');
 
@@ -164,6 +217,16 @@ mixin _$UsersModel on UsersModelBase, Store {
   }
 
   @override
+  dynamic changeUsername(String value) {
+    final _$actionInfo = _$UsersModelBaseActionController.startAction();
+    try {
+      return super.changeUsername(value);
+    } finally {
+      _$UsersModelBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   dynamic changePassword(String value) {
     final _$actionInfo = _$UsersModelBaseActionController.startAction();
     try {
@@ -174,9 +237,19 @@ mixin _$UsersModel on UsersModelBase, Store {
   }
 
   @override
+  dynamic changeConfirmPassword(String value) {
+    final _$actionInfo = _$UsersModelBaseActionController.startAction();
+    try {
+      return super.changeConfirmPassword(value);
+    } finally {
+      _$UsersModelBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   String toString() {
     final string =
-        'response: ${response.toString()},checboxValue: ${checboxValue.toString()},email: ${email.toString()},password: ${password.toString()},error: ${error.toString()},errorText: ${errorText.toString()},check: ${check.toString()},getEmail: ${getEmail.toString()},pass: ${pass.toString()},getErrorText: ${getErrorText.toString()}';
+        'response: ${response.toString()},checboxValue: ${checboxValue.toString()},email: ${email.toString()},username: ${username.toString()},password: ${password.toString()},confirmPassword: ${confirmPassword.toString()},error: ${error.toString()},errorText: ${errorText.toString()},check: ${check.toString()},getEmail: ${getEmail.toString()},getUsername: ${getUsername.toString()},pass: ${pass.toString()},confirmPass: ${confirmPass.toString()},getErrorText: ${getErrorText.toString()}';
     return '{$string}';
   }
 }
