@@ -1,6 +1,6 @@
 const { authSecret} = require('../.env')
 const jwt = require('jwt-simple')
-const bcrypt = require('bcrypt-nodejs')
+const bcrypt = require('bcrypt')
 
 module.exports = app => {
     const signin = async (req, res) => {
@@ -12,27 +12,54 @@ module.exports = app => {
             .where({email: req.body.email})
             .first()
 
-        if (!user) return res.status(400).send('Usuário não encontrado!')
+        const erro = { error: 'usuário não encontrado'}
+        if (!user) return res.status(400).json(erro)
 
-        const isMatch = bcrypt.compareSync(req.body.password, user.password)
-        if (!isMatch) return res.status(401).send('Email ou senha inválidos')
+        // let match = checkUser(req.body.password, user.password);
+        const match = await bcrypt.compare(req.body.password, user.password);
 
-        const now = Math.floor(Date.now() / 1000)
+        console.log(match)
 
-        const payload = {
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            admin: user.admin,
-            iat: now,
-            exp: now + (60*60)
+        if(match){
+            const now = Math.floor(Date.now() / 1000)
+
+            const payload = {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                admin: user.admin,
+                iat: now,
+                exp: now + (60 * 60)
+            }
+
+            res.json({
+                ...payload,
+                token: jwt.encode(payload, authSecret)
+            })
+
+        }else{
+            res.status(401).send('Email ou senha inválidos')
         }
 
-        res.json({
-            ...payload,
-            token: jwt.encode(payload, authSecret)
-        })
+        
+        
     }
+
+
+    async function checkUser(username, password) {
+        //... fetch user from a db etc.
+
+        const match = await bcrypt.compare(username, password);
+
+        if (match) {
+            return true;
+           
+        }
+        return false;
+
+
+    }
+
 
     const validateToken = async (req, res) => {
         const userData = req.body || null
